@@ -1,24 +1,35 @@
 ﻿server:
   port: 8080
 
+
 spring:
-  redis:
-    host: localhost
-    port: 6379
+  application:
+    name: gateway 
+  logging:
+    level:
+      org.springframework.web: INFO
+      org.springframework.cloud.gateway: INFO
+      reactor.netty.http.server.AccessLog: INFO 
+  data:
+    redis:
+      host: localhost
+      port: 6379
   cloud:
     gateway:
-      routes:
-        - id: account
-          uri: http://localhost:8081
-          predicates:
-            - Path=/api/account/**
-          filters:
-            - StripPrefix=1
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
-                key-resolver: "#{@ipKeyResolver}"
+      server:
+        webflux:
+          routes:
+            - id: account
+              uri: http://localhost:8081
+              predicates:
+                - Path=/api/account/**
+              filters:
+                - StripPrefix=1
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
+                    key-resolver: "#{@ipKeyResolver}"
 
 management:
   endpoints:

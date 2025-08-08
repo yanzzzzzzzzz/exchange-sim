@@ -5,3 +5,13 @@ management:
     web:
       exposure:
         include: health,info
+
+spring:
+  application:
+    name: account
+
+logging:
+  level:
+    org.springframework.web: INFO
+    org.springframework.cloud.gateway: INFO
+    reactor.netty.http.server.AccessLog: INFO
