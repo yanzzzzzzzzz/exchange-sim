@@ -1,12 +1,24 @@
-﻿# Gradle
-.gradle/
+﻿# 編譯輸出目錄
+bin/
 build/
+target/
 out/
 
-# IDE
+# 編譯檔案
+*.class
+*.jar
+*.war
+
+# IDE 產生的檔案
 .idea/
-*.iml
 .vscode/
+*.iml
+.project
+.classpath
+.settings/
+
+# Gradle
+.gradle/
 
 # OS
 .DS_Store

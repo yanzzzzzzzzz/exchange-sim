@@ -1,5 +1,6 @@
 server:
   port: 8081
+
 management:
   endpoints:
     web:
@@ -9,9 +10,22 @@ management:
 spring:
   application:
     name: account
+  
+  # R2DBC Configuration
+  r2dbc:
+    url: r2dbc:h2:mem:///accountdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+  
+  # H2 Console (for development)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 
 logging:
   level:
     org.springframework.web: INFO
     org.springframework.cloud.gateway: INFO
     reactor.netty.http.server.AccessLog: INFO
+    org.springframework.r2dbc: DEBUG

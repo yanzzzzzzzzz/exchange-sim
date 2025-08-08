@@ -1,4 +1,4 @@
-package com.example.gateway;
+package gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,6 +19,7 @@ public class GatewayApplication {
     RouterFunction<ServerResponse> httpRoutes() {
         return route(GET("/ping"), req -> ServerResponse.ok().bodyValue("pong"));
     }
+
     @Bean
     public org.springframework.cloud.gateway.filter.ratelimit.KeyResolver ipKeyResolver() {
         return exchange -> reactor.core.publisher.Mono.just(

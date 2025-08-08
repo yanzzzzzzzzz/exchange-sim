@@ -1,4 +1,4 @@
-package com.example.account.util;
+package account.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,43 +17,41 @@ public class TestUtils {
     /**
      * 註冊測試用戶
      */
-    public static WebTestClient.ResponseSpec registerUser(WebTestClient webTestClient, 
-                                                         String email, 
-                                                         String password, 
-                                                         String username) {
+    public static WebTestClient.ResponseSpec registerUser(WebTestClient webTestClient,
+            String email,
+            String password,
+            String username) {
         Map<String, String> registerRequest = Map.of(
-            "email", email,
-            "password", password,
-            "username", username
-        );
+                "email", email,
+                "password", password,
+                "username", username);
 
         return webTestClient.post()
-            .uri("/api/account/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(registerRequest)
-            .exchange();
+                .uri("/api/account/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(registerRequest)
+                .exchange();
     }
 
     /**
      * 登入並取得 access token
      */
-    public static String loginAndGetToken(WebTestClient webTestClient, 
-                                        String email, 
-                                        String password) throws Exception {
+    public static String loginAndGetToken(WebTestClient webTestClient,
+            String email,
+            String password) throws Exception {
         Map<String, String> loginRequest = Map.of(
-            "email", email,
-            "password", password
-        );
+                "email", email,
+                "password", password);
 
         String responseBody = webTestClient.post()
-            .uri("/api/account/login")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(loginRequest)
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody(String.class)
-            .returnResult()
-            .getResponseBody();
+                .uri("/api/account/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(loginRequest)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .returnResult()
+                .getResponseBody();
 
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         return jsonNode.get("accessToken").asText();
@@ -63,12 +61,12 @@ public class TestUtils {
      * 註冊並登入，返回 access token
      */
     public static String registerAndLogin(WebTestClient webTestClient,
-                                        String email,
-                                        String password,
-                                        String username) throws Exception {
+            String email,
+            String password,
+            String username) throws Exception {
         // 註冊
         registerUser(webTestClient, email, password, username)
-            .expectStatus().isCreated();
+                .expectStatus().isCreated();
 
         // 登入並返回 token
         return loginAndGetToken(webTestClient, email, password);
@@ -92,10 +90,10 @@ public class TestUtils {
      * 驗證錯誤回應格式
      */
     public static void expectErrorResponse(WebTestClient.BodyContentSpec bodySpec,
-                                         String expectedError) {
+            String expectedError) {
         bodySpec
-            .jsonPath("$.error").isEqualTo(expectedError)
-            .jsonPath("$.message").exists();
+                .jsonPath("$.error").isEqualTo(expectedError)
+                .jsonPath("$.message").exists();
     }
 
     /**
@@ -103,38 +101,38 @@ public class TestUtils {
      */
     public static void expectValidationErrorResponse(WebTestClient.BodyContentSpec bodySpec) {
         bodySpec
-            .jsonPath("$.error").isEqualTo("validation_error")
-            .jsonPath("$.message").exists()
-            .jsonPath("$.details").exists();
+                .jsonPath("$.error").isEqualTo("validation_error")
+                .jsonPath("$.message").exists()
+                .jsonPath("$.details").exists();
     }
 
     /**
      * 驗證使用者回應格式
      */
     public static void expectUserResponse(WebTestClient.BodyContentSpec bodySpec,
-                                        String expectedEmail,
-                                        String expectedUsername) {
+            String expectedEmail,
+            String expectedUsername) {
         bodySpec
-            .jsonPath("$.id").exists()
-            .jsonPath("$.email").isEqualTo(expectedEmail)
-            .jsonPath("$.username").isEqualTo(expectedUsername)
-            .jsonPath("$.createdAt").exists();
+                .jsonPath("$.id").exists()
+                .jsonPath("$.email").isEqualTo(expectedEmail)
+                .jsonPath("$.username").isEqualTo(expectedUsername)
+                .jsonPath("$.createdAt").exists();
     }
 
     /**
      * 驗證登入回應格式
      */
     public static void expectLoginResponse(WebTestClient.BodyContentSpec bodySpec,
-                                         String expectedEmail,
-                                         String expectedUsername) {
+            String expectedEmail,
+            String expectedUsername) {
         bodySpec
-            .jsonPath("$.accessToken").exists()
-            .jsonPath("$.refreshToken").exists()
-            .jsonPath("$.tokenType").isEqualTo("Bearer")
-            .jsonPath("$.expiresIn").isEqualTo(3600)
-            .jsonPath("$.user.email").isEqualTo(expectedEmail)
-            .jsonPath("$.user.username").isEqualTo(expectedUsername)
-            .jsonPath("$.user.id").exists();
+                .jsonPath("$.accessToken").exists()
+                .jsonPath("$.refreshToken").exists()
+                .jsonPath("$.tokenType").isEqualTo("Bearer")
+                .jsonPath("$.expiresIn").isEqualTo(3600)
+                .jsonPath("$.user.email").isEqualTo(expectedEmail)
+                .jsonPath("$.user.username").isEqualTo(expectedUsername)
+                .jsonPath("$.user.id").exists();
     }
 
     /**
@@ -151,12 +149,10 @@ public class TestUtils {
         public static final String VALID_EMAIL = "test@example.com";
         public static final String VALID_PASSWORD = "password123";
         public static final String VALID_USERNAME = "testuser";
-        public static final String VALID_NICKNAME = "Test User";
-        
+
         public static final String INVALID_EMAIL = "invalid-email";
         public static final String SHORT_PASSWORD = "123456";
         public static final String SHORT_USERNAME = "ab";
         public static final String LONG_USERNAME = "a".repeat(33);
-        public static final String LONG_NICKNAME = "a".repeat(33);
     }
 }

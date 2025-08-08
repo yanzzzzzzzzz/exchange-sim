@@ -14,13 +14,24 @@
 
 ## 專案結構
 
-```
+```text
 .
-├── gateway        # API Gateway (Spring Cloud Gateway)
-├── account        # Account 微服務
-├── common         # 共用程式碼
+├── gateway/       # API Gateway (Spring Cloud Gateway)
+│   └── src/main/java/gateway/
+├── account/       # Account 微服務 (WebFlux + R2DBC)
+│   └── src/main/java/account/
+├── common/        # 共用程式碼
+├── docs/          # API 文件
 └── build.gradle.kts / settings.gradle.kts
 ```
+
+## 包名結構
+
+所有微服務都採用簡潔的包名結構：
+
+* **Gateway**: `gateway.*`
+* **Account**: `account.*` (controller, service, repository, model, config)
+* **Common**: `common.*`
 
 ## 啟動方式
 
@@ -46,7 +57,7 @@ docker run -p 6379:6379 redis
 
 Gateway 啟動後，訪問：
 
-```
+```text
 http://localhost:8080/api/account/whoami
 ```
 

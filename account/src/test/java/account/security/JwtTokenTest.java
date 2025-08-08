@@ -1,4 +1,4 @@
-package com.example.account.security;
+package account.security;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +29,7 @@ class JwtTokenTest {
     void shouldGenerateValidJwtToken() {
         // 這個測試需要實際的 JWT 服務實作
         // 目前只是展示測試結構
-        
+
         // Given
         String userId = testUserId;
         String email = testEmail;
@@ -42,7 +42,7 @@ class JwtTokenTest {
         // assertNotNull(token);
         // assertTrue(token.startsWith("eyJ")); // JWT 格式
         // assertTrue(jwtService.validateToken(token));
-        
+
         assertTrue(true); // 暫時通過測試
     }
 
@@ -57,7 +57,7 @@ class JwtTokenTest {
 
         // Then
         // assertTrue(isValid);
-        
+
         assertTrue(true); // 暫時通過測試
     }
 
@@ -65,14 +65,15 @@ class JwtTokenTest {
     @DisplayName("過期的 token 應該驗證失敗")
     void shouldRejectExpiredToken() {
         // Given
-        // String expiredToken = jwtService.generateToken(testUserId, testEmail, -1); // 已過期
+        // String expiredToken = jwtService.generateToken(testUserId, testEmail, -1); //
+        // 已過期
 
         // When
         // boolean isValid = jwtService.validateToken(expiredToken);
 
         // Then
         // assertFalse(isValid);
-        
+
         assertTrue(true); // 暫時通過測試
     }
 
@@ -87,7 +88,7 @@ class JwtTokenTest {
 
         // Then
         // assertFalse(isValid);
-        
+
         assertTrue(true); // 暫時通過測試
     }
 
@@ -104,7 +105,7 @@ class JwtTokenTest {
         // Then
         // assertEquals(testUserId, extractedUserId);
         // assertEquals(testEmail, extractedEmail);
-        
+
         assertTrue(true); // 暫時通過測試
     }
 
@@ -121,7 +122,7 @@ class JwtTokenTest {
         // assertNotNull(refreshToken);
         // assertTrue(refreshToken.startsWith("rft_"));
         // assertTrue(jwtService.validateRefreshToken(refreshToken));
-        
+
         assertTrue(true); // 暫時通過測試
     }
 
@@ -137,7 +138,7 @@ class JwtTokenTest {
         // Then
         // assertNotNull(newAccessToken);
         // assertTrue(jwtService.validateToken(newAccessToken));
-        
+
         assertTrue(true); // 暫時通過測試
     }
 }
