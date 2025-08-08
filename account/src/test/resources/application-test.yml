@@ -1,0 +1,28 @@
+spring:
+  profiles:
+    active: test
+
+# Test specific configurations
+jwt:
+  secret: test-secret-key-for-testing-only
+  expiration: 3600
+
+logging:
+  level:
+    com.example.account: DEBUG
+    org.springframework.web: DEBUG
+    
+# In-memory database for testing
+spring:
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb
+    username: sa
+    password: 
+  h2:
+    console:
+      enabled: true
+
+# Disable actuator endpoints in tests
+management:
+  endpoints:
+    enabled-by-default: false
