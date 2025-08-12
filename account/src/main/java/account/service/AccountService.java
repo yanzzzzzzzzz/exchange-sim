@@ -44,6 +44,9 @@ public class AccountService {
         if (request.password() == null || request.password().trim().isEmpty()) {
             errors.put("password", Arrays.asList("must be a valid password"));
         }
+        if (request.password().length() < 7) {
+            errors.put("password", Arrays.asList("password length must more then 7"));
+        }
         if (!errors.isEmpty()) {
             throw new ValidationException("validation_error", "invalid fields", errors);
         }
