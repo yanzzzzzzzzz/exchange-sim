@@ -39,6 +39,8 @@ public class AccountService {
 
         if (request.username() == null || request.username().trim().isEmpty()) {
             errors.put("username", Arrays.asList("must be a valid username"));
+        } else if (request.username().length() < 3) {
+            errors.put("username", Arrays.asList("username must more than 3"));
         }
         if (request.password() == null || request.password().trim().isEmpty()) {
             errors.put("password", Arrays.asList("must be a valid password"));
