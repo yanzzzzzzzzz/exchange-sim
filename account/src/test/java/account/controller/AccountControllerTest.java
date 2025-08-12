@@ -32,7 +32,7 @@ class AccountControllerTest {
                 @DisplayName("成功註冊新帳號")
                 void shouldRegisterSuccessfully() throws Exception {
                         Map<String, String> registerRequest = Map.of(
-                                        "email", "test@example.com",
+                                        "email", "test456@example.com",
                                         "password", "password123",
                                         "username", "testuser");
 
@@ -45,7 +45,7 @@ class AccountControllerTest {
                                         .expectHeader().contentType(MediaType.APPLICATION_JSON)
                                         .expectBody()
                                         .jsonPath("$.msg").isEqualTo("register success")
-                                        .jsonPath("$.user.email").isEqualTo("test@example.com")
+                                        .jsonPath("$.user.email").isEqualTo("test456@example.com")
                                         .jsonPath("$.user.username").isEqualTo("testuser")
                                         .jsonPath("$.user.id").exists()
                                         .jsonPath("$.user.createdAt").exists();
@@ -60,7 +60,7 @@ class AccountControllerTest {
                                         "username", "testuser");
 
                         webTestClient.post()
-                                        .uri("/api/account/register")
+                                        .uri("/account/register")
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(registerRequest)
                                         .exchange()
@@ -80,7 +80,7 @@ class AccountControllerTest {
                                         "username", "testuser");
 
                         webTestClient.post()
-                                        .uri("/api/account/register")
+                                        .uri("/account/register")
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(registerRequest)
                                         .exchange()
@@ -100,7 +100,7 @@ class AccountControllerTest {
                         );
 
                         webTestClient.post()
-                                        .uri("/api/account/register")
+                                        .uri("/account/register")
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(registerRequest)
                                         .exchange()
@@ -120,7 +120,7 @@ class AccountControllerTest {
                                         "username", "user1");
 
                         webTestClient.post()
-                                        .uri("/api/account/register")
+                                        .uri("/account/register")
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(firstRequest)
                                         .exchange()
@@ -133,7 +133,7 @@ class AccountControllerTest {
                                         "username", "user2");
 
                         webTestClient.post()
-                                        .uri("/api/account/register")
+                                        .uri("/account/register")
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(duplicateRequest)
                                         .exchange()
@@ -157,7 +157,7 @@ class AccountControllerTest {
                                         "username", "loginuser");
 
                         webTestClient.post()
-                                        .uri("/api/account/register")
+                                        .uri("/account/register")
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(registerRequest)
                                         .exchange()
@@ -172,7 +172,7 @@ class AccountControllerTest {
                                         "password", "password123");
 
                         webTestClient.post()
-                                        .uri("/api/account/login")
+                                        .uri("/account/login")
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(loginRequest)
                                         .exchange()
@@ -195,7 +195,7 @@ class AccountControllerTest {
                                         "password", "wrongpassword");
 
                         webTestClient.post()
-                                        .uri("/api/account/login")
+                                        .uri("/account/login")
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(loginRequest)
                                         .exchange()
@@ -213,7 +213,7 @@ class AccountControllerTest {
                                         "password", "password123");
 
                         webTestClient.post()
-                                        .uri("/api/account/login")
+                                        .uri("/account/login")
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(loginRequest)
                                         .exchange()
@@ -231,7 +231,7 @@ class AccountControllerTest {
                                         "password", "password123");
 
                         webTestClient.post()
-                                        .uri("/api/account/login")
+                                        .uri("/account/login")
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(loginRequest)
                                         .exchange()
@@ -257,7 +257,7 @@ class AccountControllerTest {
                                         "username", "getuser");
 
                         webTestClient.post()
-                                        .uri("/api/account/register")
+                                        .uri("/account/register")
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(registerRequest)
                                         .exchange()
@@ -268,7 +268,7 @@ class AccountControllerTest {
                                         "password", "password123");
 
                         var loginResponse = webTestClient.post()
-                                        .uri("/api/account/login")
+                                        .uri("/account/login")
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(loginRequest)
                                         .exchange()
@@ -287,7 +287,7 @@ class AccountControllerTest {
                 @DisplayName("成功查詢自己的資訊 (/me)")
                 void shouldGetOwnUserInfo() throws Exception {
                         webTestClient.get()
-                                        .uri("/api/account/me")
+                                        .uri("/account/me")
                                         .header("Authorization", "Bearer " + accessToken)
                                         .exchange()
                                         .expectStatus().isOk()
@@ -303,7 +303,7 @@ class AccountControllerTest {
                 @DisplayName("成功查詢指定使用者資訊")
                 void shouldGetUserById() throws Exception {
                         webTestClient.get()
-                                        .uri("/api/account/users/" + userId)
+                                        .uri("/account/users/" + userId)
                                         .header("Authorization", "Bearer " + accessToken)
                                         .exchange()
                                         .expectStatus().isOk()
@@ -317,7 +317,7 @@ class AccountControllerTest {
                 @DisplayName("無 token 查詢應回傳 401")
                 void shouldReturn401WithoutToken() throws Exception {
                         webTestClient.get()
-                                        .uri("/api/account/me")
+                                        .uri("/account/me")
                                         .exchange()
                                         .expectStatus().isUnauthorized();
                 }
@@ -326,7 +326,7 @@ class AccountControllerTest {
                 @DisplayName("無效 token 查詢應回傳 401")
                 void shouldReturn401WithInvalidToken() throws Exception {
                         webTestClient.get()
-                                        .uri("/api/account/me")
+                                        .uri("/account/me")
                                         .header("Authorization", "Bearer invalid-token")
                                         .exchange()
                                         .expectStatus().isUnauthorized();
@@ -336,7 +336,7 @@ class AccountControllerTest {
                 @DisplayName("查詢不存在的使用者應回傳 404")
                 void shouldReturn404ForNonExistentUser() throws Exception {
                         webTestClient.get()
-                                        .uri("/api/account/users/usr_nonexistent")
+                                        .uri("/account/users/usr_nonexistent")
                                         .header("Authorization", "Bearer " + accessToken)
                                         .exchange()
                                         .expectStatus().isNotFound()
