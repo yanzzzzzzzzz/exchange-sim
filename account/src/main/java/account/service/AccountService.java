@@ -4,6 +4,8 @@ import account.exception.ConflictException;
 import account.exception.ValidationException;
 import account.model.User;
 import account.repository.UserRepository;
+import dto.LoginRequest;
+import dto.LoginResponse;
 import dto.RegisterRequest;
 import dto.RegisterResponse;
 import lombok.RequiredArgsConstructor;
@@ -78,5 +80,39 @@ public class AccountService {
 
     private boolean isValidEmail(String email) {
         return email != null && email.contains("@") && email.contains(".");
+    }
+
+    public LoginResponse login(LoginRequest request) {
+        validateLoginRequest(request);
+
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new RuntimeException("login_error"));
+
+        if (!request.password().equals(user.getPassword())) {
+            throw new RuntimeException("login_error");
+        }
+
+        // Generate token (simplified for now)
+        String token = generateToken(user);
+
+        return new LoginResponse(token, "login success", "Bearer", 3600, user);
+    }
+
+    private String generateToken(User user) {
+        // Simple token generation - in production use JWT
+        return "token_" + UUID.randomUUID().toString();
+    }
+
+    private void validateLoginRequest(LoginRequest request) {
+        Map<String, List<String>> errors = new HashMap<>();
+
+        if (request.email() == null || request.email().trim().isEmpty()) {
+            errors.put("email", Arrays.asList("must be a valid email"));
+        } else if (!isValidEmail(request.email())) {
+            errors.put("email", Arrays.asList("must be a valid email"));
+        }
+        if (!errors.isEmpty()) {
+            throw new ValidationException("validation_error", "invalid fields", errors);
+        }
     }
 }
