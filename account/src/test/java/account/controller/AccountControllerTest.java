@@ -176,12 +176,13 @@ class AccountControllerTest {
                                         .expectStatus().isOk()
                                         .expectBody()
                                         .jsonPath("$.accessToken").exists()
-                                        .jsonPath("$.refreshToken").exists()
                                         .jsonPath("$.tokenType").isEqualTo("Bearer")
                                         .jsonPath("$.expiresIn").isEqualTo(3600)
                                         .jsonPath("$.user.email").isEqualTo("login-success@example.com")
                                         .jsonPath("$.user.username").isEqualTo("loginuser1")
-                                        .jsonPath("$.user.id").exists();
+                                        .jsonPath("$.user.id").exists()
+                                        .jsonPath("$.user.createdAt").exists()
+                                        .jsonPath("$.user.updatedAt").exists();
                 }
 
                 @Test

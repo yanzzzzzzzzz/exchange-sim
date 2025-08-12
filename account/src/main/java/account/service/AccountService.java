@@ -4,10 +4,12 @@ import account.exception.ConflictException;
 import account.exception.ValidationException;
 import account.model.User;
 import account.repository.UserRepository;
+import account.util.JwtUtil;
 import dto.LoginRequest;
 import dto.LoginResponse;
 import dto.RegisterRequest;
 import dto.RegisterResponse;
+import dto.UserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import java.util.*;
 public class AccountService {
 
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
     public RegisterResponse register(RegisterRequest request) {
         validateRegisterRequest(request);
@@ -92,15 +95,18 @@ public class AccountService {
             throw new RuntimeException("login_error");
         }
 
-        // Generate token (simplified for now)
-        String token = generateToken(user);
+        // Generate JWT token
+        String accessToken = jwtUtil.generateToken(user.getId(), user.getEmail(), user.getUsername());
 
-        return new LoginResponse(token, "login success", "Bearer", 3600, user);
-    }
+        // Create user info
+        UserInfo userInfo = new UserInfo(
+                user.getId(),
+                user.getEmail(),
+                user.getUsername(),
+                user.getCreatedAt(),
+                user.getUpdatedAt());
 
-    private String generateToken(User user) {
-        // Simple token generation - in production use JWT
-        return "token_" + UUID.randomUUID().toString();
+        return new LoginResponse(accessToken, "Bearer", 3600, userInfo);
     }
 
     private void validateLoginRequest(LoginRequest request) {

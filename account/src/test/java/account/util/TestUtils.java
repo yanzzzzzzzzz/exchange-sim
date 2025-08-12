@@ -27,7 +27,7 @@ public class TestUtils {
                 "username", username);
 
         return webTestClient.post()
-                .uri("/api/account/register")
+                .uri("/account/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(registerRequest)
                 .exchange();
@@ -44,7 +44,7 @@ public class TestUtils {
                 "password", password);
 
         String responseBody = webTestClient.post()
-                .uri("/api/account/login")
+                .uri("/account/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(loginRequest)
                 .exchange()
