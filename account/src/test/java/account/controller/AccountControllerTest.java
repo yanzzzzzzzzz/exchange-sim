@@ -1,6 +1,5 @@
 package account.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,9 +19,6 @@ class AccountControllerTest {
 
         @Autowired
         private WebTestClient webTestClient;
-
-        @Autowired
-        private ObjectMapper objectMapper;
 
         @Nested
         @DisplayName("註冊 Register Tests")
@@ -148,13 +144,11 @@ class AccountControllerTest {
         @DisplayName("登入 Login Tests")
         class LoginTests {
 
-                @BeforeEach
-                void setUp() throws Exception {
-                        // 註冊測試用帳號
+                private void registerTestUser(String email, String username) {
                         Map<String, String> registerRequest = Map.of(
-                                        "email", "login@example.com",
+                                        "email", email,
                                         "password", "password123",
-                                        "username", "loginuser");
+                                        "username", username);
 
                         webTestClient.post()
                                         .uri("/account/register")
@@ -167,8 +161,11 @@ class AccountControllerTest {
                 @Test
                 @DisplayName("成功登入應回傳 JWT token")
                 void shouldLoginSuccessfully() throws Exception {
+                        // 註冊測試用帳號
+                        registerTestUser("login-success@example.com", "loginuser1");
+
                         Map<String, String> loginRequest = Map.of(
-                                        "email", "login@example.com",
+                                        "email", "login-success@example.com",
                                         "password", "password123");
 
                         webTestClient.post()
@@ -182,16 +179,19 @@ class AccountControllerTest {
                                         .jsonPath("$.refreshToken").exists()
                                         .jsonPath("$.tokenType").isEqualTo("Bearer")
                                         .jsonPath("$.expiresIn").isEqualTo(3600)
-                                        .jsonPath("$.user.email").isEqualTo("login@example.com")
-                                        .jsonPath("$.user.username").isEqualTo("loginuser")
+                                        .jsonPath("$.user.email").isEqualTo("login-success@example.com")
+                                        .jsonPath("$.user.username").isEqualTo("loginuser1")
                                         .jsonPath("$.user.id").exists();
                 }
 
                 @Test
                 @DisplayName("錯誤密碼應回傳 401")
                 void shouldReturn401ForWrongPassword() throws Exception {
+                        // 註冊測試用帳號
+                        registerTestUser("login-wrong-pwd@example.com", "loginuser2");
+
                         Map<String, String> loginRequest = Map.of(
-                                        "email", "login@example.com",
+                                        "email", "login-wrong-pwd@example.com",
                                         "password", "wrongpassword");
 
                         webTestClient.post()
@@ -245,16 +245,12 @@ class AccountControllerTest {
         @DisplayName("查詢使用者 Get User Tests")
         class GetUserTests {
 
-                private String accessToken;
-                private String userId;
-
-                @BeforeEach
-                void setUp() throws Exception {
-                        // 註冊並登入取得 token
+                private String registerAndLoginUser(String email, String username) {
+                        // 註冊帳號
                         Map<String, String> registerRequest = Map.of(
-                                        "email", "getuser@example.com",
+                                        "email", email,
                                         "password", "password123",
-                                        "username", "getuser");
+                                        "username", username);
 
                         webTestClient.post()
                                         .uri("/account/register")
@@ -263,29 +259,26 @@ class AccountControllerTest {
                                         .exchange()
                                         .expectStatus().isCreated();
 
+                        // 登入取得 token (這裡先用 mock token，實際需要解析 JSON)
                         Map<String, String> loginRequest = Map.of(
-                                        "email", "getuser@example.com",
+                                        "email", email,
                                         "password", "password123");
 
-                        var loginResponse = webTestClient.post()
+                        webTestClient.post()
                                         .uri("/account/login")
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(loginRequest)
                                         .exchange()
-                                        .expectStatus().isOk()
-                                        .returnResult(String.class)
-                                        .getResponseBody()
-                                        .blockFirst();
+                                        .expectStatus().isOk();
 
-                        // 解析回應取得 token 和 userId (實際實作中需要 JSON 解析)
-                        // 這裡假設有方法可以解析
-                        this.accessToken = "mock-access-token"; // 實際需要從回應解析
-                        this.userId = "usr_01HXYZ"; // 實際需要從回應解析
+                        return "mock-access-token"; // 實際需要從回應解析
                 }
 
                 @Test
                 @DisplayName("成功查詢自己的資訊 (/me)")
                 void shouldGetOwnUserInfo() throws Exception {
+                        String accessToken = registerAndLoginUser("getuser-me@example.com", "getuser1");
+
                         webTestClient.get()
                                         .uri("/account/me")
                                         .header("Authorization", "Bearer " + accessToken)
@@ -293,8 +286,8 @@ class AccountControllerTest {
                                         .expectStatus().isOk()
                                         .expectBody()
                                         .jsonPath("$.id").exists()
-                                        .jsonPath("$.email").isEqualTo("getuser@example.com")
-                                        .jsonPath("$.username").isEqualTo("getuser")
+                                        .jsonPath("$.email").isEqualTo("getuser-me@example.com")
+                                        .jsonPath("$.username").isEqualTo("getuser1")
                                         .jsonPath("$.createdAt").exists()
                                         .jsonPath("$.updatedAt").exists();
                 }
@@ -302,6 +295,9 @@ class AccountControllerTest {
                 @Test
                 @DisplayName("成功查詢指定使用者資訊")
                 void shouldGetUserById() throws Exception {
+                        String accessToken = registerAndLoginUser("getuser-byid@example.com", "getuser2");
+                        String userId = "usr_01HXYZ"; // 實際需要從註冊回應解析
+
                         webTestClient.get()
                                         .uri("/account/users/" + userId)
                                         .header("Authorization", "Bearer " + accessToken)
@@ -309,8 +305,8 @@ class AccountControllerTest {
                                         .expectStatus().isOk()
                                         .expectBody()
                                         .jsonPath("$.id").isEqualTo(userId)
-                                        .jsonPath("$.email").isEqualTo("getuser@example.com")
-                                        .jsonPath("$.username").isEqualTo("getuser");
+                                        .jsonPath("$.email").isEqualTo("getuser-byid@example.com")
+                                        .jsonPath("$.username").isEqualTo("getuser2");
                 }
 
                 @Test
@@ -335,6 +331,8 @@ class AccountControllerTest {
                 @Test
                 @DisplayName("查詢不存在的使用者應回傳 404")
                 void shouldReturn404ForNonExistentUser() throws Exception {
+                        String accessToken = registerAndLoginUser("getuser-404@example.com", "getuser3");
+
                         webTestClient.get()
                                         .uri("/account/users/usr_nonexistent")
                                         .header("Authorization", "Bearer " + accessToken)
