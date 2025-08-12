@@ -40,11 +40,9 @@ public class AccountService {
         if (request.username() == null || request.username().trim().isEmpty()) {
             errors.put("username", Arrays.asList("must be a valid username"));
         }
-
         if (request.password() == null || request.password().trim().isEmpty()) {
             errors.put("password", Arrays.asList("must be a valid password"));
-        }
-        if (request.password().length() < 7) {
+        } else if (request.password().length() < 7) {
             errors.put("password", Arrays.asList("password length must more then 7"));
         }
         if (!errors.isEmpty()) {
