@@ -1,14 +1,33 @@
 package account.controller;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import account.exception.ValidationException;
 import account.service.AccountService;
+import dto.ErrorResponse;
+import dto.RegisterRequest;
+import dto.RegisterResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/account")
+@RequestMapping("/account")
 @RequiredArgsConstructor
 public class AccountController {
+
   private final AccountService accountService;
+
+  @PostMapping("/register")
+  public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    try {
+      RegisterResponse response = accountService.register(request);
+      return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    } catch (ValidationException e) {
+      ErrorResponse errorResponse = new ErrorResponse(
+          e.getError(),
+          e.getMessage(),
+          e.getDetails());
+      return ResponseEntity.badRequest().body(errorResponse);
+    }
+  }
 }

@@ -1,38 +1,39 @@
 package account.model;
 
 import lombok.*;
-import org.springframework.data.annotation.Id;
+import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
+@Entity
+@Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table("users")
+@EntityListeners(AuditingEntityListener.class)
 public class User {
 
     @Id
     private String id;
 
-    @Column("username")
+    @Column(name = "username")
     private String username;
 
-    @Column("email")
+    @Column(name = "email")
     private String email;
 
-    @Column("password")
+    @Column(name = "password")
     private String password;
 
     @CreatedDate
-    @Column("created_at")
-    private OffsetDateTime createdAt;
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
 
     @LastModifiedDate
-    @Column("updated_at")
-    private OffsetDateTime updatedAt;
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 }

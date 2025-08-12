@@ -11,11 +11,20 @@ spring:
   application:
     name: account
   
-  # R2DBC Configuration
-  r2dbc:
-    url: r2dbc:h2:mem:///accountdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+  # JPA Configuration
+  datasource:
+    url: jdbc:h2:mem:accountdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: sa
     password: 
+    driver-class-name: org.h2.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
   
   # H2 Console (for development)
   h2:
@@ -26,6 +35,6 @@ spring:
 logging:
   level:
     org.springframework.web: INFO
-    org.springframework.cloud.gateway: INFO
-    reactor.netty.http.server.AccessLog: INFO
-    org.springframework.r2dbc: DEBUG
+    account: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
