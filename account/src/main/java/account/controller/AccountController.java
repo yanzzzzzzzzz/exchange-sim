@@ -1,5 +1,6 @@
 package account.controller;
 
+import account.exception.ConflictException;
 import account.exception.ValidationException;
 import account.service.AccountService;
 import dto.ErrorResponse;
@@ -28,6 +29,12 @@ public class AccountController {
           e.getMessage(),
           e.getDetails());
       return ResponseEntity.badRequest().body(errorResponse);
+    } catch (ConflictException e) {
+      ErrorResponse errorResponse = new ErrorResponse(
+          e.getError(),
+          e.getMessage(),
+          null);
+      return ResponseEntity.status(409).body(errorResponse);
     }
   }
 }

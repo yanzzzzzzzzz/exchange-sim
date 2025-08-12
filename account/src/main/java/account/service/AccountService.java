@@ -1,5 +1,6 @@
 package account.service;
 
+import account.exception.ConflictException;
 import account.exception.ValidationException;
 import account.model.User;
 import account.repository.UserRepository;
@@ -19,6 +20,7 @@ public class AccountService {
 
     public RegisterResponse register(RegisterRequest request) {
         validateRegisterRequest(request);
+        checkEmailConflict(request.email());
 
         User user = createUser(request);
         User savedUser = userRepository.save(user);
@@ -31,6 +33,8 @@ public class AccountService {
 
         if (request.email() == null || request.email().trim().isEmpty()) {
             errors.put("email", Arrays.asList("must be a valid email"));
+        } else if (!isValidEmail(request.email())) {
+            errors.put("email", Arrays.asList("must be a valid email"));
         }
 
         if (request.username() == null || request.username().trim().isEmpty()) {
@@ -40,9 +44,14 @@ public class AccountService {
         if (request.password() == null || request.password().trim().isEmpty()) {
             errors.put("password", Arrays.asList("must be a valid password"));
         }
-
         if (!errors.isEmpty()) {
             throw new ValidationException("validation_error", "invalid fields", errors);
+        }
+    }
+
+    private void checkEmailConflict(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new ConflictException("conflict", "email already registered");
         }
     }
 
@@ -62,5 +71,9 @@ public class AccountService {
 
     private String generateUserId() {
         return "usr_" + UUID.randomUUID().toString();
+    }
+
+    private boolean isValidEmail(String email) {
+        return email != null && email.contains("@") && email.contains(".");
     }
 }
