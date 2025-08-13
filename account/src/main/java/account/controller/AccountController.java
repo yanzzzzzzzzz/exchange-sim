@@ -75,4 +75,15 @@ public class AccountController {
       return ResponseEntity.status(404).body(errorResponse);
     }
   }
+
+  @GetMapping("/users/{id}")
+  public ResponseEntity<?> getUser(@PathVariable String id) {
+    try {
+      UserInfo userInfo = accountService.getUserById(id);
+      return ResponseEntity.ok(userInfo);
+    } catch (Exception e) {
+      ErrorResponse errorResponse = new ErrorResponse("user_not_found", "User not found", null);
+      return ResponseEntity.status(404).body(errorResponse);
+    }
+  }
 }
