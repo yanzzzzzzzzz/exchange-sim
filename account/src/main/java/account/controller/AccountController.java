@@ -77,7 +77,7 @@ public class AccountController {
   }
 
   @GetMapping("/users/{id}")
-  public ResponseEntity<?> getUser(@PathVariable String id) {
+  public ResponseEntity<?> getUser(@PathVariable("id") String id) {
     try {
       UserInfo userInfo = accountService.getUserById(id);
       return ResponseEntity.ok(userInfo);
