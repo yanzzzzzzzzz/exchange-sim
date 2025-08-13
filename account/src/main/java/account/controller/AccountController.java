@@ -8,10 +8,15 @@ import dto.LoginRequest;
 import dto.LoginResponse;
 import dto.RegisterRequest;
 import dto.RegisterResponse;
+import dto.UserInfo;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
 
 @RestController
 @RequestMapping("/account")
@@ -55,6 +60,19 @@ public class AccountController {
       ErrorResponse errorResponse = new ErrorResponse("invalid_credentials", "email or password is incorrect", null);
       return ResponseEntity.status(401).body(errorResponse);
     }
+  }
 
+  @GetMapping("/me")
+  public ResponseEntity<?> getCurrentUser(Authentication authentication, HttpServletRequest request) {
+    try {
+      String userId = (String) authentication.getPrincipal();
+
+      UserInfo userInfo = accountService.getUserById(userId);
+
+      return ResponseEntity.ok(userInfo);
+    } catch (Exception e) {
+      ErrorResponse errorResponse = new ErrorResponse("user_not_found", "User not found", null);
+      return ResponseEntity.status(404).body(errorResponse);
+    }
   }
 }

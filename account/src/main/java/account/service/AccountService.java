@@ -121,4 +121,16 @@ public class AccountService {
             throw new ValidationException("validation_error", "invalid fields", errors);
         }
     }
+
+    public UserInfo getUserById(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return new UserInfo(
+                user.getId(),
+                user.getEmail(),
+                user.getUsername(),
+                user.getCreatedAt(),
+                user.getUpdatedAt());
+    }
 }
