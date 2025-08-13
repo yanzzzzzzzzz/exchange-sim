@@ -1,6 +1,5 @@
 package account.controller;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -8,12 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Map;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@ActiveProfiles("test")
 @DisplayName("Account API Tests")
 class AccountControllerTest {
 
@@ -260,19 +263,95 @@ class AccountControllerTest {
                                         .exchange()
                                         .expectStatus().isCreated();
 
-                        // 登入取得 token (這裡先用 mock token，實際需要解析 JSON)
+                        // 登入取得 token
                         Map<String, String> loginRequest = Map.of(
                                         "email", email,
                                         "password", "password123");
 
-                        webTestClient.post()
+                        var response = webTestClient.post()
                                         .uri("/account/login")
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(loginRequest)
                                         .exchange()
-                                        .expectStatus().isOk();
+                                        .expectStatus().isOk()
+                                        .expectBody()
+                                        .jsonPath("$.accessToken").exists()
+                                        .returnResult();
 
-                        return "mock-access-token"; // 實際需要從回應解析
+                        // 從回應中解析 accessToken
+                        String responseBody = new String(response.getResponseBody());
+                        try {
+                                // 簡單的 JSON 解析取得 accessToken
+                                String tokenPrefix = "\"accessToken\":\"";
+                                int startIndex = responseBody.indexOf(tokenPrefix) + tokenPrefix.length();
+                                int endIndex = responseBody.indexOf("\"", startIndex);
+                                return responseBody.substring(startIndex, endIndex);
+                        } catch (Exception e) {
+                                throw new RuntimeException(
+                                                "Failed to extract access token from response: " + responseBody, e);
+                        }
+                }
+
+                private String registerAndLoginUserWithUserId(String email, String username) {
+                        // 註冊帳號並取得 userId
+                        Map<String, String> registerRequest = Map.of(
+                                        "email", email,
+                                        "password", "password123",
+                                        "username", username);
+
+                        var registerResponse = webTestClient.post()
+                                        .uri("/account/register")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(registerRequest)
+                                        .exchange()
+                                        .expectStatus().isCreated()
+                                        .expectBody()
+                                        .jsonPath("$.user.id").exists()
+                                        .returnResult();
+
+                        // 從註冊回應中解析 userId
+                        String registerResponseBody = new String(registerResponse.getResponseBody());
+                        String userId;
+                        try {
+                                String userIdPrefix = "\"id\":\"";
+                                int startIndex = registerResponseBody.indexOf(userIdPrefix) + userIdPrefix.length();
+                                int endIndex = registerResponseBody.indexOf("\"", startIndex);
+                                userId = registerResponseBody.substring(startIndex, endIndex);
+                        } catch (Exception e) {
+                                throw new RuntimeException(
+                                                "Failed to extract user ID from response: " + registerResponseBody, e);
+                        }
+
+                        // 登入取得 token
+                        Map<String, String> loginRequest = Map.of(
+                                        "email", email,
+                                        "password", "password123");
+
+                        var loginResponse = webTestClient.post()
+                                        .uri("/account/login")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(loginRequest)
+                                        .exchange()
+                                        .expectStatus().isOk()
+                                        .expectBody()
+                                        .jsonPath("$.accessToken").exists()
+                                        .returnResult();
+
+                        // 從回應中解析 accessToken
+                        String loginResponseBody = new String(loginResponse.getResponseBody());
+                        String accessToken;
+                        try {
+                                String tokenPrefix = "\"accessToken\":\"";
+                                int startIndex = loginResponseBody.indexOf(tokenPrefix) + tokenPrefix.length();
+                                int endIndex = loginResponseBody.indexOf("\"", startIndex);
+                                accessToken = loginResponseBody.substring(startIndex, endIndex);
+                        } catch (Exception e) {
+                                throw new RuntimeException(
+                                                "Failed to extract access token from response: " + loginResponseBody,
+                                                e);
+                        }
+
+                        return userId + ":" + accessToken; // 回傳格式: "userId:accessToken"
                 }
 
                 @Test
@@ -296,9 +375,21 @@ class AccountControllerTest {
                 @Test
                 @DisplayName("成功查詢指定使用者資訊")
                 void shouldGetUserById() throws Exception {
-                        String accessToken = registerAndLoginUser("getuser-byid@example.com", "getuser2");
-                        String userId = "usr_01HXYZ"; // 實際需要從註冊回應解析
+                        String userIdAndToken = registerAndLoginUserWithUserId("getuser-byid@example.com", "getuser2");
+                        String[] parts = userIdAndToken.split(":");
+                        String userId = parts[0];
+                        String accessToken = parts[1];
 
+                        // First, let's test the access token with /me endpoint to verify it's valid
+                        webTestClient.get()
+                                        .uri("/account/me")
+                                        .header("Authorization", "Bearer " + accessToken)
+                                        .exchange()
+                                        .expectStatus().isOk()
+                                        .expectBody()
+                                        .jsonPath("$.id").isEqualTo(userId);
+
+                        // Now test the /users/{id} endpoint
                         webTestClient.get()
                                         .uri("/account/users/" + userId)
                                         .header("Authorization", "Bearer " + accessToken)
@@ -340,9 +431,10 @@ class AccountControllerTest {
                                         .exchange()
                                         .expectStatus().isNotFound()
                                         .expectBody()
-                                        .jsonPath("$.error").isEqualTo("not_found")
-                                        .jsonPath("$.message").isEqualTo("user not found");
+                                        .jsonPath("$.error").isEqualTo("user_not_found")
+                                        .jsonPath("$.message").isEqualTo("User not found");
                 }
+
         }
 
 }

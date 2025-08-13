@@ -26,7 +26,7 @@ public class SecurityConfig {
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/account/register", "/account/login").permitAll()
-            .requestMatchers("/account/me").authenticated()
+            .requestMatchers("/account/me", "/account/users/{id}").authenticated()
             .anyRequest().permitAll())
         .exceptionHandling(exceptions -> exceptions
             .authenticationEntryPoint((request, response, authException) -> {

@@ -1,6 +1,22 @@
 spring:
-  profiles:
-    active: test
+  # In-memory database for testing
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  
+  h2:
+    console:
+      enabled: true
 
 # Test specific configurations
 jwt:
@@ -11,16 +27,6 @@ logging:
   level:
     com.example.account: DEBUG
     org.springframework.web: DEBUG
-    
-# In-memory database for testing
-spring:
-  r2dbc:
-    url: r2dbc:h2:mem:///testdb
-    username: sa
-    password: 
-  h2:
-    console:
-      enabled: true
 
 # Disable actuator endpoints in tests
 management:
