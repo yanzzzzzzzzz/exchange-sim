@@ -10,4 +10,4 @@ plugins {
 }
 
 rootProject.name = "exchange-sim"
-include("common", "gateway", "auth", "order", "account")
+include("common", "gateway", "auth", "order", "account", "wallet")

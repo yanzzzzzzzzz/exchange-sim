@@ -25,11 +25,12 @@ spring:
                 - Path=/api/account/**
               filters:
                 - StripPrefix=1
-                - name: RequestRateLimiter
-                  args:
-                    redis-rate-limiter.replenishRate: 10
-                    redis-rate-limiter.burstCapacity: 20
-                    key-resolver: "#{@ipKeyResolver}"
+            - id: wallet
+              uri: http://localhost:8082
+              predicates:
+                - Path=/api/wallet/**
+              filters:
+                - StripPrefix=1
 
 management:
   endpoints:
