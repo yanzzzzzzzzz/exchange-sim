@@ -149,7 +149,6 @@
   "id": "usr_01HXYZ...",
   "email": "aer@rewr.com",
   "username": "asd",
-  "nickname": "Jack",
   "createdAt": "2025-08-08T07:00:00Z",
   "updatedAt": "2025-08-08T07:00:00Z"
 }
@@ -161,46 +160,6 @@
 ```json
 {"error":"not_found","message":"user not found"}
 ```
-
----
-
-## 4) 更新暱稱 Update Nickname
-
-* **Method/Path**: `PATCH /api/account/users/{id}/nickname` 或 `PATCH /api/account/me/nickname`
-* **Auth**: 需要（Bearer JWT）
-* **描述**: 更新指定使用者或自己的暱稱
-
-### Request Body
-
-```json
-{
-  "nickname": "New Nick"
-}
-```
-
-### 驗證規則
-
-* `nickname`: 必填、長度 1–32、可限制字元集（中英數與常見符號）
-* 僅能更新自己的暱稱；除非具備管理者權限
-
-### Responses
-
-* `200 OK`
-
-```json
-{
-  "msg": "nickname updated",
-  "user": {
-    "id": "usr_01HXYZ...",
-    "nickname": "New Nick",
-    "updatedAt": "2025-08-08T07:00:00Z"
-  }
-}
-```
-
-* `400 Bad Request`（驗證不過）
-* `401/403`（未授權/無權限）
-* `404 Not Found`
 
 ---
 
@@ -243,13 +202,6 @@ curl -X POST \
 curl -H "Authorization: Bearer <ACCESS_TOKEN>" \
   http://localhost:8080/api/account/me
 
-# 更新暱稱（自己）
-curl -X PATCH \
-  -H "Authorization: Bearer <ACCESS_TOKEN>" \
-  -H "Content-Type: application/json" \
-  -d '{"nickname":"New Nick"}' \
-  http://localhost:8080/api/account/me/nickname
-```
 
 ---
 
