@@ -2,15 +2,15 @@
 
 本專案為 Spring Boot 多模組微服務架構範例，目前包含：
 
-* **gateway**：Spring Cloud Gateway，負責路由、限流、過濾器。
-* **account**：使用 WebFlux 實作的帳號服務。
-* **common**：共用程式碼與模型。
+- **gateway**：Spring Cloud Gateway，負責路由、限流、過濾器。
+- **account**：使用 WebFlux 實作的帳號服務。
+- **common**：共用程式碼與模型。
 
 ## 系統需求
 
-* Java 17+
-* Gradle 8+
-* Docker（本地 Redis 測試用）
+- Java 17+
+- Gradle 8+
+- Docker（本地 Redis 測試用）
 
 ## 專案結構
 
@@ -29,9 +29,9 @@
 
 所有微服務都採用簡潔的包名結構：
 
-* **Gateway**: `gateway.*`
-* **Account**: `account.*` (controller, service, repository, model, config)
-* **Common**: `common.*`
+- **Gateway**: `gateway.*`
+- **Account**: `account.*` (controller, service, repository, model, config)
+- **Common**: `common.*`
 
 ## 啟動方式
 
@@ -44,7 +44,7 @@ docker run -p 6379:6379 redis
 ### 2. 啟動 Account Service
 
 ```bash
-./gradlew :account:bootRun
+.\gradlew :account:bootRun
 ```
 
 啟動完成後，可在 [http://localhost:8081/account/whoami](http://localhost:8081/account/whoami) 測試。
@@ -52,7 +52,7 @@ docker run -p 6379:6379 redis
 ### 3. 啟動 Gateway
 
 ```bash
-./gradlew :gateway:bootRun
+.\gradlew :gateway:bootRun
 ```
 
 Gateway 啟動後，訪問：
